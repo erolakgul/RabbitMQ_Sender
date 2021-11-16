@@ -1,4 +1,5 @@
 ﻿using RabbitMQ.Client;
+using RabbitMQ_Sender.Models;
 using System;
 using System.Text;
 
@@ -16,21 +17,27 @@ namespace RabbitMQ_Sender
             //ch.Close(Constants.ReplySuccess, "Closing the channel"); 
             //conn.Close(Constants.ReplySuccess, "Closing the connection");
 
+            Category _cat = Category.GetInstance();
+            _cat.Fill(_cat);
+
+            var body = Helper.ObjectToByteArray(_cat);
+
             using (var connection = factory.CreateConnection())
             {
                 using (var channel = connection.CreateModel())
                 {
-                    channel.QueueDeclare(queue: "hello",
+                    channel.QueueDeclare(queue: "modal",
                                          durable: false,
                                          exclusive: false,
                                          autoDelete: false,
                                          arguments: null);
 
-                    string message = "Hello World!";
-                    var body = Encoding.UTF8.GetBytes(message);
+                    //string message = "Hello World!";
+                    string message = _cat.Name + " " + _cat.Description;
+                    //var body = Encoding.UTF8.GetBytes(message);
 
                     channel.BasicPublish(exchange: "",
-                                         routingKey: "hello",
+                                         routingKey: "modal",
                                          basicProperties: null,
                                          body: body);
                     Console.WriteLine(" [x] Sent {0}", message);
