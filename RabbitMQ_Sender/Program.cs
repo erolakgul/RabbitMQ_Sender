@@ -20,7 +20,7 @@ namespace RabbitMQ_Sender
             Category _cat = Category.GetInstance();
             _cat.Fill(_cat);
 
-            var body = Helper.ObjectToByteArray(_cat);
+            var body = Helper<Category>.ObjectToByteArray(_cat);
 
             using (var connection = factory.CreateConnection())
             {

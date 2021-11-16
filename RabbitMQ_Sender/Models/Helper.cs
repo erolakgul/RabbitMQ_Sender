@@ -1,6 +1,8 @@
-﻿namespace RabbitMQ_Sender.Models
+﻿using Newtonsoft.Json;
+
+namespace RabbitMQ_Sender.Models
 {
-    public static class Helper
+    public static class Helper<T> where T : class
     {
         public static byte[] ObjectToByteArray(object obj)
         {
@@ -16,6 +18,12 @@
             var stringObj = System.Text.Encoding.ASCII.GetString(bytes);
             // proper way to Deserialize object
             return System.Text.Json.JsonSerializer.Deserialize<object>(stringObj);
+        }
+
+        public static T ByteArrayToGeneric(byte[] bytes)
+        {
+            var data = System.Text.Encoding.ASCII.GetString(bytes);
+            return JsonConvert.DeserializeObject<T>(data);
         }
     }
 }
