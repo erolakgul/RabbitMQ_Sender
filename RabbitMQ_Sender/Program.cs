@@ -10,7 +10,7 @@ namespace RabbitMQ_Sender
     {
         static void Main(string[] args)
         {
-            ConnectionFactory factory = new ConnectionFactory() { HostName = "localhost"  }; //, Port = 15672
+            ConnectionFactory factory = new ConnectionFactory() { HostName = "localhost" }; //, Port = 15672
 
             //IConnection conn = factory.CreateConnection();
             //IModel ch = conn.CreateModel();
@@ -20,27 +20,40 @@ namespace RabbitMQ_Sender
             Category _cat = Category.GetInstance();
             _cat.Fill(_cat);
 
-            var body = Helper<Category>.ObjectToByteArray(_cat);
+          
 
             using (var connection = factory.CreateConnection())
             {
                 using (var channel = connection.CreateModel())
                 {
-                    channel.QueueDeclare(queue: "modal",
-                                         durable: false,
-                                         exclusive: false,
-                                         autoDelete: false,
-                                         arguments: null);
 
-                    //string message = "Hello World!";
-                    string message = _cat.Name + " " + _cat.Description;
-                    //var body = Encoding.UTF8.GetBytes(message);
+                    while (true)
+                    {
+                        #region string continuously sending msg
+                        string messagex = Console.ReadLine();
+                        var body = Helper<string>.ObjectToByteArray(messagex); // Encoding.UTF8.GetBytes(messagex); 
+                        #endregion
 
-                    channel.BasicPublish(exchange: "",
-                                         routingKey: "modal",
-                                         basicProperties: null,
-                                         body: body);
-                    Console.WriteLine(" [x] Sent {0}", message);
+                        //var body = Helper<Category>.ObjectToByteArray(_cat);
+
+                        channel.QueueDeclare(queue: "modal",
+                                             durable: false,
+                                             exclusive: false,
+                                             autoDelete: false,
+                                             arguments: null);
+
+
+                        //string message = $"\n Category Name : { _cat.Name}. \n Description   : {_cat.Description}.";
+                       
+                        channel.BasicPublish(exchange: "",
+                                             routingKey: "modal",
+                                             basicProperties: null,
+                                             body: body);
+
+                        Console.WriteLine("Sending Message : {0}" , messagex);
+                        //Console.WriteLine(" [x] Sent => {0}", message);
+                    }
+
                 }
             }
 
